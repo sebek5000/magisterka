@@ -14,12 +14,19 @@ class Object:
 # A = Object("A", 5, 15, 30, 15)
 # B = Object("B", 45, 150, 90, 25)
 # C = Object("C", 200, 115, 80, 55)
+# field_height = 400
+# field_length = 400
 
 #Objects from this picture:
 # (0) Image: 'data/samples\dog.jpg'
 #  bike at 144.09793, 568.79895, 113.62761, 447.58099
 #  dog at 129.81325, 314.50992, 221.97189, 522.70416
 # truck at 468.16602, 688.88599, 83.17181, 170.87808
+
+
+field_height = 600
+field_length = 700
+
 A = Object("rower", 144.09793, 113.62761, 568.79895 - 144.09793, 447.58099 - 113.62761)
 B = Object("pies", 129.81325, 221.97189, 314.50992 - 129.81325, 522.70416 - 221.97189)
 C = Object("ciężarówka", 468.16602, 83.17181, 688.88599 - 468.16602, 170.87808 - 83.17181)
@@ -29,8 +36,7 @@ objects.append(A)
 objects.append(B)
 objects.append(C)
 
-field_height = 600
-field_length = 700
+
 
 
 #Funkcje przynaleznosci
@@ -88,15 +94,15 @@ class Rule:
         self.operator = operator
         self.sentence = sentence
 
-rule1 = Rule("center", 1, prop3, prop8, "min", "Na środku")
-rule2 = Rule("top left corner", 1, prop1, prop6, "min", "Lewy, górny narożnik")
-rule3 = Rule("top right corner", 1, prop5, prop10, "min", "Prawy, górny narożnik")
-rule4 = Rule("bottom right corner", 1, prop5, prop10, "min", "Prawy, dolny narożnik")
-rule5 = Rule("bottom left corner", 1, prop1, prop10,"min", "Lewy, dolny narożnik")
-rule6 = Rule("top left", 1, prop2, prop7, "min", "Lewa, górna część")
-rule7 = Rule("top right", 1, prop4,prop7, "min", "Prawa, górna część")
-rule8 = Rule("bottom right", 1, prop4, prop9, "min", "Prawa, dolna część")
-rule9 = Rule("bottom left", 1, prop2, prop9, "min", "Lewa, dolna część")
+rule1 = Rule("center", 1, prop3.name, prop8.name, "min", "Na środku")
+rule2 = Rule("top left corner", 1, prop1.name, prop6.name, "min", "Lewy, górny narożnik")
+rule3 = Rule("top right corner", 1, prop5.name, prop10.name, "min", "Prawy, górny narożnik")
+rule4 = Rule("bottom right corner", 1, prop5.name, prop10.name, "min", "Prawy, dolny narożnik")
+rule5 = Rule("bottom left corner", 1, prop1.name, prop10.name,"min", "Lewy, dolny narożnik")
+rule6 = Rule("top left", 1, prop2.name, prop7.name, "min", "Lewa, górna część")
+rule7 = Rule("top right", 1, prop4.name,prop7.name, "min", "Prawa, górna część")
+rule8 = Rule("bottom right", 1, prop4.name, prop9.name, "min", "Prawa, dolna część")
+rule9 = Rule("bottom left", 1, prop2.name, prop9.name, "min", "Lewa, dolna część")
 
 
 rules = []
@@ -210,6 +216,28 @@ for i in range(len(objects)):
 
 print(pred)#TODO do poprawienia, bo coś jest chyba nie tak
 
+#TODO Add Rule Predicates
+
+#rule_pred = [] Od razu dodam do pred
+for i in range(len(rules)):
+    for j in range(len(pred)):
+        if pred[j][0] == rules[i].prop1:
+            obj_found = pred[j][3]
+            for k in range(len(pred)):
+                if pred[k][0] == rules[i].prop2 and pred[k][3] == obj_found:
+                    if pred[j][6] != 0 and pred[k][6] != 0:
+                        ruleobj_cf = min(pred[j][6], pred[k][6])#TODO Na razie zawsze jest tam minimum
+                        temp = []
+                        temp.append(rules[i].name)
+                        temp.append(ruleobj_cf * objects[obj_found].size * rules[i].saliency)
+                        temp.append(0)
+                        temp.append(obj_found)
+                        temp.append(-2)
+                        temp.append(i)
+                        temp.append(ruleobj_cf)
+                        pred.append(temp)
+
+
 # for predicate in pred:
 #     print(predicate)
 
@@ -217,14 +245,17 @@ desc = []
 for i in range(len(pred)):
     if pred[i][4] == -1:
         zdanie = objects[pred[i][3]].name + " " + properties[pred[i][5]].sentence
-    elif pred[i][5] == -2:
+    elif pred[i][4] == -2:
         zdanie = objects[pred[i][3]].name + " " + rules[pred[i][5]].sentence
     else:
         zdanie = objects[pred[i][3]].name + " " + relations[pred[i][5]].sentence + " " + objects[pred[i][4]].name
     desc.append(zdanie)
 
+
 for description in desc:
     print(description)
+
+    #TODO Select predicates
 
 
 
