@@ -52,6 +52,7 @@ class Property:
         self.sentence = sentence
 
 
+
 #Add properties:
 prop1 = Property("left edge", 0.9, 'b_l', [-2, -2, -1, -0.85], "Przy lewej krawędzi.")
 prop2 = Property("left", 0.8, 'b_l', [-10,-0.9,-0.6,0], "W lewej części")
@@ -237,25 +238,58 @@ for i in range(len(rules)):
                         temp.append(ruleobj_cf)
                         pred.append(temp)
 
+#Sortowanie według współczynnika pewności
+pred.sort(key=lambda p: p[1], reverse=True)
+print(pred)
 
-# for predicate in pred:
-#     print(predicate)
 
-desc = []
+# Wyświetl wszystkie
+# desc = []
+# for i in range(len(pred)):
+#     if pred[i][4] == -1:
+#         zdanie = objects[pred[i][3]].name + " " + properties[pred[i][5]].sentence
+#     elif pred[i][4] == -2:
+#         zdanie = objects[pred[i][3]].name + " " + rules[pred[i][5]].sentence
+#     else:
+#         zdanie = objects[pred[i][3]].name + " " + relations[pred[i][5]].sentence + " " + objects[pred[i][4]].name
+#     desc.append(zdanie)
+# for description in desc:
+#     print(description)
+
+
+#Selekcja predykatów
+used = []
+for obj in objects:
+    used.append(0)
+
 for i in range(len(pred)):
-    if pred[i][4] == -1:
-        zdanie = objects[pred[i][3]].name + " " + properties[pred[i][5]].sentence
-    elif pred[i][4] == -2:
-        zdanie = objects[pred[i][3]].name + " " + rules[pred[i][5]].sentence
+    if pred[i][4] < 0:
+        if used[pred[i][3]] < 1:#To może być zmienna
+            used[pred[i][3]] = used[pred[i][3]] + 1
+            pred[i][2] = 1
+    else :
+        if used[pred[i][3]] < 1 and used[pred[i][4]] ==1:
+            used[pred[i][3]] = used[pred[i][3]] + 1
+            pred[i][2] = 1
+
+pred_out = []
+
+for i in range(len(pred)):
+    if pred[i][1] >0 and pred[i][2] == 1:
+        pred_out.append(pred[i])
+
+#Wyświetlanie zdań
+desc = []
+for i in range(len(pred_out)):
+    if pred_out[i][4] == -1:
+        zdanie = objects[pred_out[i][3]].name + " " + properties[pred_out[i][5]].sentence
+    elif pred_out[i][4] == -2:
+        zdanie = objects[pred_out[i][3]].name + " " + rules[pred_out[i][5]].sentence
     else:
-        zdanie = objects[pred[i][3]].name + " " + relations[pred[i][5]].sentence + " " + objects[pred[i][4]].name
+        zdanie = objects[pred_out[i][3]].name + " " + relations[pred_out[i][5]].sentence + " " + objects[pred_out[i][4]].name
     desc.append(zdanie)
-
-
 for description in desc:
-    print(description)
-
-    #TODO Select predicates
+     print(description)
 
 
 
