@@ -9,6 +9,7 @@ import sys
 import time
 import datetime
 import argparse
+import json
 
 from PIL import Image
 
@@ -95,6 +96,12 @@ if __name__ == "__main__":
     print("\nSaving images:")
     # Iterate through images and save plot of detections
     for img_i, (path, detections) in enumerate(zip(imgs, img_detections)):
+        #Getting width and height of the image
+        im = Image.open(path.replace("\\", "/"))
+        width = im.width
+        height = im.height
+        im.close()
+
         with open("data.txt", "a") as text_file:
             text_file.write("(%d) Image: '%s'\n" % (img_i, path))
         print("(%d) Image: '%s" % (img_i, path))
@@ -112,15 +119,25 @@ if __name__ == "__main__":
             unique_labels = detections[:, -1].cpu().unique()
             n_cls_preds = len(unique_labels)
             bbox_colors = random.sample(colors, n_cls_preds)
+            data = {}
+            data['objects'] = []
             for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections:
-
                 #print("\t+ Label: %s, Conf: %.5f" % (classes[int(cls_pred)], cls_conf.item()))
                 with open("data.txt", "a") as text_file:
                     text_file.write(" %s at %.5f, %.5f, %.5f, %.5f \n" % (classes[int(cls_pred)], x1, x2, y1, y2))
                 print(" %s at %.5f, %.5f, %.5f, %.5f" % (classes[int(cls_pred)], x1, x2, y1, y2))
 
+
                 box_w = x2 - x1
                 box_h = y2 - y1
+
+                data['objects'].append({
+                    'name': classes[int(cls_pred)],
+                    'x': "%.5f" % x1,
+                    'y': "%.5f" % y1,
+                    'width': "%.5f" % box_w,
+                    'height': "%.5f" % box_h
+                })
 
                 color = bbox_colors[int(np.where(unique_labels == int(cls_pred))[0])]
                 # Create a Rectangle patch
@@ -136,6 +153,10 @@ if __name__ == "__main__":
                     verticalalignment="top",
                     bbox={"color": color, "pad": 0},
                 )
+        data['picture_height'] = height
+        data['picture_width'] = width
+        with open("json/" + path.replace("data/samples\\", "").replace(".jpg", "") + ".txt", "w") as outfile:
+            json.dump(data, outfile)
 
         # Save generated image with detections
         plt.axis("off")
