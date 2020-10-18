@@ -1,3 +1,8 @@
+# Based on YOLOv3
+# https://github.com/eriklindernoren/PyTorch-YOLOv3/blob/master/README.md
+# This file is used to draw bounding boxes of objects described in json format.
+# The picture is saved in main folder as "json_box.png"
+
 import json
 import numpy as np
 import matplotlib.pyplot as plt
@@ -5,7 +10,7 @@ from matplotlib import patches
 from matplotlib.ticker import NullLocator
 from PIL import Image
 
-with open('json/ludzie.txt') as json_file:
+with open('json/test.txt') as json_file:
     data = json.load(json_file)
 
 img = np.array(Image.new('RGB', (data['picture_width'], data['picture_height'])))
@@ -23,7 +28,6 @@ for obj in data['objects']:
         bbox={"color": 'red', "pad": 0},
     )
     bbox = patches.Rectangle((float(obj['x']), float(obj['y'])), float(obj['width']), float(obj['height']), linewidth=2, edgecolor='blue', facecolor="none")
-    # Add the bbox to the plot
     ax.add_patch(bbox)
 
 plt.axis("off")

@@ -1,9 +1,10 @@
-# objects
-# TODO Read them from file
-
+# This file is used to create a description of bounding boxes on the picture found by YOLOv3
+# described in a json file.
 import json
 
 
+# Objects that are represented by bounding boxes in the picture, x and y are coordinates of the upper left vertex,
+# name is the label of the class
 class Object:
     def __init__(self, name, x, y, width, height):
         self.name = name
@@ -12,22 +13,24 @@ class Object:
         self.width = float(width)
         self.height = float(height)
 
-#TODO make it as an argument
-with open('json/ludzie.txt') as json_file:
+
+# Opening json file
+# TODO Make filename as an argument of the function
+with open('json/test.txt') as json_file:
     data = json.load(json_file)
 
+# Read height and width of image and objects from json file
 field_height = data['picture_height']
 field_width = data['picture_width']
-
 objects = []
 for obj in data['objects']:
     objects.append(Object(obj['name'], obj['x'], obj['y'], obj['width'], obj['height']))
 
 
-# Funkcje przynaleznosci
-# TODO zakladam, ze wszystkie beda trapezami
-
-
+# Properties - name, saliency(0-1), argument_type, mem_values - values for the membership function,
+# sentence - the description
+# TODO I assumed that all are trapezoid membership function
+# TODO change description of those properties
 class Property:
     def __init__(self, name, saliency, argument_type, mem_values, sentence):
         self.name = name
@@ -48,30 +51,20 @@ prop7 = Property("top", 0.5, 'b_t', [-10, -0.9, -0.6, 0], "Na górze")
 prop8 = Property("center height", 0.8, 'c_tb', [-0.2, -0.05, 0.05, 0.2], "Na środku wysokości")
 prop9 = Property("bottom", 0.5, 'b_b', [0, 0.6, 0.9, 10], "Na dole")
 prop10 = Property("bottom edge", 0.7, 'b_b', [0.85, 1, 2, 2], "Przy dolnej krawędzi")
-properties = []
-properties.append(prop1)
-properties.append(prop2)
-properties.append(prop3)
-properties.append(prop4)
-properties.append(prop5)
-properties.append(prop6)
-properties.append(prop7)
-properties.append(prop8)
-properties.append(prop9)
-properties.append(prop10)
+properties = [prop1, prop2, prop3, prop4, prop5, prop6, prop7, prop8, prop9, prop10]
 
-# Add_relations (they are like properties)
+# Add relations (they are like properties)
 rel1 = Property("on the right", 0.8, 'd_lr', [0, 0.01, 0.5, 2], "Po prawej stronie od")
 rel2 = Property("on he left", 0.8, 'd_lr', [-2, -0.5, -0.01, 0], "Po lewej stronie od")
 rel3 = Property("above", 0.8, 'd_tb', [-2, -0.5, -0.01, 0], "Powyżej")
 rel4 = Property("below", 0.8, 'd_tb', [0, 0.01, 0.5, 2], "Poniżej")
-relations = []
-relations.append(rel1)
-relations.append(rel2)
-relations.append(rel3)
-relations.append(rel4)
+relations = [rel1, rel2, rel3, rel4]
 
 
+# Rules - name, saliency(0-1), prop1, prop2 - properties that need to be true to this rule to activate,
+# operator - operator that joins two properties, sentence - the description
+# TODO I assumed that all are trapezoid membership function
+# TODO change description of those properties
 class Rule:
     def __init__(self, name, saliency, prop1, prop2, operator, sentence):
         self.name = name
@@ -82,6 +75,7 @@ class Rule:
         self.sentence = sentence
 
 
+# Add rules
 rule1 = Rule("center", 1, prop3.name, prop8.name, "min", "Na środku")
 rule2 = Rule("top left corner", 1, prop1.name, prop6.name, "min", "Lewy, górny narożnik")
 rule3 = Rule("top right corner", 1, prop5.name, prop10.name, "min", "Prawy, górny narożnik")
@@ -91,18 +85,10 @@ rule6 = Rule("top left", 1, prop2.name, prop7.name, "min", "Lewa, górna częś�
 rule7 = Rule("top right", 1, prop4.name, prop7.name, "min", "Prawa, górna część")
 rule8 = Rule("bottom right", 1, prop4.name, prop9.name, "min", "Prawa, dolna część")
 rule9 = Rule("bottom left", 1, prop2.name, prop9.name, "min", "Lewa, dolna część")
+rules = [rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9]
 
-rules = []
-rules.append(rule1)
-rules.append(rule2)
-rules.append(rule3)
-rules.append(rule4)
-rules.append(rule5)
-rules.append(rule6)
-rules.append(rule7)
-rules.append(rule8)
-rules.append(rule9)
 
+# Normalize objects properties by the size of the image
 for obj in objects:
     obj.boundary_left = 2 * obj.x / field_width - 1
     obj.boundary_right = 2 * (obj.x + obj.width) / field_width - 1
@@ -111,31 +97,33 @@ for obj in objects:
     obj.size = (obj.width / field_width) * (obj.height / field_height)  # saliency
 
 
-def membership_function_x_value(type, obj, obj2):  ##rename_it
-    if type == 'b_l':
+# Calculate membership function x value based on normalized properties of the object
+def membership_function_x_value(type, obj, obj2):
+    if type == 'b_l':  # left side
         return obj.boundary_left
-    elif type == 'b_r':
+    elif type == 'b_r':  # right side
         return obj.boundary_right
-    elif type == 'c_lr':
+    elif type == 'c_lr':  # center of width
         return (obj.boundary_left + obj.boundary_right) / 2
-    elif type == 'b_t':
+    elif type == 'b_t':  # top
         return obj.boundary_top
-    elif type == 'b_b':
+    elif type == 'b_b':  # bottom
         return obj.boundary_bottom
-    elif type == 'c_tb':
+    elif type == 'c_tb':  # center of height
         return (obj.boundary_top + obj.boundary_bottom) / 2
-    elif type == 'd_lr':
+    elif type == 'd_lr':  # distance between width centroids
         return (obj.boundary_right + obj.boundary_left) / 2 - (obj2.boundary_right + obj2.boundary_left) / 2
-    elif type == 'd_tb':
+    elif type == 'd_tb':  # distance between height centroids
         return (obj.boundary_top + obj.boundary_bottom) / 2 - (obj2.boundary_top + obj2.boundary_bottom) / 2
     elif type == 'd':
-        print("Nieobsługiwane")
+        print("Not supported")
         return 7000
     else:
-        print("Coś poszło nie tak ;/")
+        print("Something went wrong during calculating membership x value;/")
         return -7100
 
 
+# Calculate membership y value based on x value and the membership function
 def membership_y_value(property, value):
     if value < property.mem_values[0]:
         return 0
@@ -149,8 +137,7 @@ def membership_y_value(property, value):
         return 0
 
 
-# TODO omijamy położenie względem obiektów (wartość 0 w drugim obiekcie)
-
+# Membership Value Function of an object to specific property
 obj_prop = []
 for prop in properties:
     temp = []
@@ -158,8 +145,7 @@ for prop in properties:
         temp.append(membership_y_value(prop, membership_function_x_value(prop.argument_type, obj, 0)))
     obj_prop.append(temp)
 
-# print(obj_prop)
-
+# Membership Value Function of two objects to specific relation
 obj_rel = []
 for rel in relations:
     tempOutside = []
@@ -171,44 +157,26 @@ for rel in relations:
         tempOutside.append(tempInside)
     obj_rel.append(tempOutside)
 
-# print(obj_rel)
-# print (obj_prop[0][1])
-pred = []
 
-# counter = 0#table starts from 0
+# Add predicates - name, certainty factor, is_used, number of object, number of second object (for relations only),
+# number of property/relation, membership value
+pred = []
 for i in range(len(objects)):
     for j in range(len(properties)):
         if obj_prop[j][i] > 0:
-            temp = []
-            temp.append(properties[j].name)  # nazwa zamiast id
-            temp.append(obj_prop[j][i] * objects[i].size * properties[j].saliency)
-            temp.append(0)
-            temp.append(i)
-            temp.append(-1)
-            temp.append(j)
-            temp.append(obj_prop[j][i])
+            temp = [properties[j].name, obj_prop[j][i] * objects[i].size * properties[j].saliency, 0, i, -1, j,
+                    obj_prop[j][i]]
             pred.append(temp)
-            # counter = counter + 1
 
     for k in range(len(objects)):
         for j in range(len(relations)):
             if obj_rel[j][i][k] > 0:
-                temp = []
-                temp.append(relations[j].name)  # nazwa zamiast id
-                temp.append(obj_rel[j][i][k] * objects[i].size * relations[j].saliency)
-                temp.append(0)
-                temp.append(i)
-                temp.append(k)
-                temp.append(j)
-                temp.append(obj_rel[j][i][k])
+                temp = [relations[j].name, obj_rel[j][i][k] * objects[i].size * relations[j].saliency, 0, i, k, j,
+                        obj_rel[j][i][k]]
                 pred.append(temp)
-                # counter = counter+ 1
 
-print(pred)  # TODO do poprawienia, bo coś jest chyba nie tak
+print(pred)
 
-# TODO Add Rule Predicates
-
-# rule_pred = [] Od razu dodam do pred
 for i in range(len(rules)):
     for j in range(len(pred)):
         if pred[j][0] == rules[i].prop1:
@@ -217,35 +185,15 @@ for i in range(len(rules)):
                 if pred[k][0] == rules[i].prop2 and pred[k][3] == obj_found:
                     if pred[j][6] != 0 and pred[k][6] != 0:
                         ruleobj_cf = min(pred[j][6], pred[k][6])  # TODO Na razie zawsze jest tam minimum
-                        temp = []
-                        temp.append(rules[i].name)
-                        temp.append(ruleobj_cf * objects[obj_found].size * rules[i].saliency)
-                        temp.append(0)
-                        temp.append(obj_found)
-                        temp.append(-2)
-                        temp.append(i)
-                        temp.append(ruleobj_cf)
+                        temp = [rules[i].name, ruleobj_cf * objects[obj_found].size * rules[i].saliency, 0, obj_found,
+                                -2, i, ruleobj_cf]
                         pred.append(temp)
 
-# Sortowanie według współczynnika pewności
+# Sort
 pred.sort(key=lambda p: p[1], reverse=True)
 print(pred)
 
-# Wyświetl wszystkie
-# desc = []
-# for i in range(len(pred)):
-#     if pred[i][4] == -1:
-#         zdanie = objects[pred[i][3]].name + " " + properties[pred[i][5]].sentence
-#     elif pred[i][4] == -2:
-#         zdanie = objects[pred[i][3]].name + " " + rules[pred[i][5]].sentence
-#     else:
-#         zdanie = objects[pred[i][3]].name + " " + relations[pred[i][5]].sentence + " " + objects[pred[i][4]].name
-#     desc.append(zdanie)
-# for description in desc:
-#     print(description)
-
-
-# Selekcja predykatów
+# Predicate selection
 used = []
 for obj in objects:
     used.append(0)
@@ -259,23 +207,23 @@ for i in range(len(pred)):
         if used[pred[i][3]] < 1 and used[pred[i][4]] == 1:
             used[pred[i][3]] = used[pred[i][3]] + 1
             pred[i][2] = 1
-
 pred_out = []
-
 for i in range(len(pred)):
     if pred[i][1] > 0 and pred[i][2] == 1:
         pred_out.append(pred[i])
 
-# Wyświetlanie zdań
+
+# Print sentences
+# TODO make them more like a sentence
 desc = []
 for i in range(len(pred_out)):
     if pred_out[i][4] == -1:
-        zdanie = objects[pred_out[i][3]].name + " " + properties[pred_out[i][5]].sentence
+        sentence = objects[pred_out[i][3]].name + " " + properties[pred_out[i][5]].sentence
     elif pred_out[i][4] == -2:
-        zdanie = objects[pred_out[i][3]].name + " " + rules[pred_out[i][5]].sentence
+        sentence = objects[pred_out[i][3]].name + " " + rules[pred_out[i][5]].sentence
     else:
-        zdanie = objects[pred_out[i][3]].name + " " + relations[pred_out[i][5]].sentence + " " + objects[
+        sentence = objects[pred_out[i][3]].name + " " + relations[pred_out[i][5]].sentence + " " + objects[
             pred_out[i][4]].name
-    desc.append(zdanie)
+    desc.append(sentence)
 for description in desc:
     print(description)
