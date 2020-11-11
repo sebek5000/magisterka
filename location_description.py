@@ -1,30 +1,12 @@
 # This file is used to create a description of bounding boxes on the picture found by YOLOv3
 # described in a json file.
-import json
 
+import common
 
-# Objects that are represented by bounding boxes in the picture, x and y are coordinates of the upper left vertex,
-# name is the label of the class
-class Object:
-    def __init__(self, name, x, y, width, height):
-        self.name = name
-        self.x = float(x)
-        self.y = float(y)
-        self.width = float(width)
-        self.height = float(height)
-
-
-# Opening json file
-# TODO Make filename as an argument of the function
-with open('json/test.txt') as json_file:
-    data = json.load(json_file)
-
-# Read height and width of image and objects from json file
-field_height = data['picture_height']
-field_width = data['picture_width']
-objects = []
-for obj in data['objects']:
-    objects.append(Object(obj['name'], obj['x'], obj['y'], obj['width'], obj['height']))
+read_json = common.read_objects_from_json('json/test.txt')
+field_height = read_json[0]
+field_width = read_json[1]
+objects = read_json[2]
 
 
 # Properties - name, saliency(0-1), argument_type, mem_values - values for the membership function,
