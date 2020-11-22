@@ -1,4 +1,5 @@
 import common
+import location_description as LD
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import patches
@@ -9,7 +10,7 @@ from PIL import ImageTk, Image
 size_of_movement = 100 # how much to move up, left, up or down the object
 percentage_of_size_change = 10 # how much enlarge, reduce the object
 chosen_object = 0 # currently chosen object's index
-new_name = 0 # name for new object
+new_name = "new_object" # name for new object
 
 # Read starting "picture" from json
 read_json = common.read_objects_from_json('json/interactive.txt')
@@ -27,7 +28,9 @@ img = img.resize((400, 400), Image.ANTIALIAS)
 img = ImageTk.PhotoImage(img)
 panel = Label(root, image=img)
 panel.image = img
-
+# text field, https://effbot.org/tkinterbook/pack.htm
+text_widget = Label(root, text='DUPA')
+text_widget.pack(side=BOTTOM)
 
 # TODO RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface
 #  (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory.
@@ -36,11 +39,15 @@ panel.image = img
 
 # refresh image after change from png file
 def refresh_image():
+    global text_widget
     image = Image.open('json_box.png')
     image = image.resize((400, 400), Image.ANTIALIAS)
     image = ImageTk.PhotoImage(image)
     panel.configure(image=image)
     panel.image = image
+    text_widget['text'] = LD.location_description(field_height, field_width, objects)
+
+
 
 
 # draw changes in the png file
@@ -58,8 +65,11 @@ def draw():
             verticalalignment="top",
             bbox={"color": 'red', "pad": 0},
         )
+        edgecolor = 'blue'
+        if objects[chosen_object] == obj:
+            edgecolor = 'yellow'
         bbox = patches.Rectangle((float(obj.x), float(obj.y)), float(obj.width), float(obj.height),
-                                 linewidth=2, edgecolor='blue', facecolor="none")
+                                 linewidth=2, edgecolor=edgecolor, facecolor="none")
         ax.add_patch(bbox)
     plt.axis("off")
     plt.gca().xaxis.set_major_locator(NullLocator())
@@ -104,7 +114,8 @@ def next():
         chosen_object = 0
     else:
         chosen_object = chosen_object + 1
-
+    draw()
+    refresh_image()
 
 # TODO think about have constant middle, not upper-left corner when changing size
 def enlarge():
@@ -130,7 +141,7 @@ def add():
     draw()
     common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
     refresh_image()
-    new_name = new_name + 1
+    new_name = new_name + "1"
 
 
 def delete():
@@ -146,16 +157,20 @@ def delete():
 
 
 # TODO: change position of buttons
-btn = Button(root, text='góra', command=up).pack()
-btn1 = Button(root, text='dół', command=down).pack()
-btn2 = Button(root, text='lewo', command=left).pack()
-btn3 = Button(root, text='prawo', command=right).pack()
-btn4 = Button(root, text='następny', command=next).pack()
-btn5 = Button(root, text='powiększ', command=enlarge).pack()
-btn6 = Button(root, text='pomniejsz', command=reduce).pack()
-btn7 = Button(root, text='dodaj', command=add).pack()
-btn8 = Button(root, text='usuń', command=delete).pack()
+btn = Button(root, text='góra', command=up).pack(side = LEFT)
+btn1 = Button(root, text='dół', command=down).pack(side = LEFT)
+btn2 = Button(root, text='lewo', command=left).pack(side = LEFT)
+btn3 = Button(root, text='prawo', command=right).pack(side = LEFT)
+btn4 = Button(root, text='następny', command=next).pack(side = LEFT)
+btn5 = Button(root, text='powiększ', command=enlarge).pack(side = LEFT)
+btn6 = Button(root, text='pomniejsz', command=reduce).pack(side = LEFT)
+btn7 = Button(root, text='dodaj', command=add).pack(side = LEFT)
+btn8 = Button(root, text='usuń', command=delete).pack(side = LEFT)
 panel.pack()
+# draw beginning state of the picture
+draw()
+refresh_image()
+
 
 # start field
 root.mainloop()
