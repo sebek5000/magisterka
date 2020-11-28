@@ -20,26 +20,59 @@ def location_description(field_height, field_width, objects):
             self.mem_values = mem_values
             self.sentence = sentence
 
+    f = open("settings/starting.txt", "r")
+    property_lines = []
+    relation_lines = []
+    rule_lines = []
+    kind_of_predicate = -1 # 0 - property, 1- relation, 2 - rule
+    for x in f:
+        if x.startswith('#'):
+            kind_of_predicate = kind_of_predicate + 1
+            continue
+        if kind_of_predicate == 0:
+            property_lines.append(x)
+        elif kind_of_predicate == 1:
+            relation_lines.append(x)
+        elif kind_of_predicate == 2:
+            rule_lines.append(x)
+        else:
+            print("Something went wrong in reading settings file!")
 
-    # Add properties:
-    prop1 = Property("left edge", 0.9, 'b_l', [-2, -2, -1, -0.85], "Przy lewej krawędzi.")
-    prop2 = Property("left", 0.8, 'b_l', [-10, -0.9, -0.6, 0], "W lewej części")
-    prop3 = Property("length center", 0.9, 'c_lr', [-0.2, -0.05, 0.05, 0.2], "Na środku szerokości")
-    prop4 = Property("right", 0.8, 'b_r', [0, 0.6, 0.9, 10], "Z prawej")
-    prop5 = Property("right edge", 0.9, 'b_r', [0.85, 1, 2, 2], "Przy prawej krawędzi")
-    prop6 = Property("top egde", 0.7, 'b_t', [-2, -2, -1, -0.85], "Przy górnej krawędzi")
-    prop7 = Property("top", 0.5, 'b_t', [-10, -0.9, -0.6, 0], "Na górze")
-    prop8 = Property("center height", 0.8, 'c_tb', [-0.2, -0.05, 0.05, 0.2], "Na środku wysokości")
-    prop9 = Property("bottom", 0.5, 'b_b', [0, 0.6, 0.9, 10], "Na dole")
-    prop10 = Property("bottom edge", 0.7, 'b_b', [0.85, 1, 2, 2], "Przy dolnej krawędzi")
-    properties = [prop1, prop2, prop3, prop4, prop5, prop6, prop7, prop8, prop9, prop10]
+    properties = []
+    relations = []
+    rules = []
+    for prop in property_lines:
+        propParams = prop.split(',')
+        properties.append(Property(propParams[0], float(propParams[1]), propParams[2],
+                                   propParams[3].split(';'), propParams[4].replace('\n', '')))
+    for rel in relation_lines:
+        propParams = rel.split(',')
+        relations.append(Property(propParams[0], float(propParams[1]), propParams[2],
+                                   propParams[3].split(';'), propParams[4].replace('\n', '')))
+
+
+
+
+
+    # # Add properties:
+    # prop1 = Property("left edge", 0.9, 'b_l', [-2, -2, -1, -0.85], "is by the left edge.")
+    # prop2 = Property("left", 0.8, 'b_l', [-10, -0.9, -0.6, 0], "is on the left side.")
+    # prop3 = Property("length center", 0.9, 'c_lr', [-0.2, -0.05, 0.05, 0.2], "is in te middle of width.")
+    # prop4 = Property("right", 0.8, 'b_r', [0, 0.6, 0.9, 10], "is on the right side.")
+    # prop5 = Property("right edge", 0.9, 'b_r', [0.85, 1, 2, 2], "is by the right edge.")
+    # prop6 = Property("top egde", 0.7, 'b_t', [-2, -2, -1, -0.85], "is by the top edge.")
+    # prop7 = Property("top", 0.5, 'b_t', [-10, -0.9, -0.6, 0], "is on the top side.")
+    # prop8 = Property("center height", 0.8, 'c_tb', [-0.2, -0.05, 0.05, 0.2], "is in the middle of height.")
+    # prop9 = Property("bottom", 0.5, 'b_b', [0, 0.6, 0.9, 10], "is on the bottom side.")
+    # prop10 = Property("bottom edge", 0.7, 'b_b', [0.85, 1, 2, 2], "is by the bottom edge.")
+    # properties = [prop1, prop2, prop3, prop4, prop5, prop6, prop7, prop8, prop9, prop10]
 
     # Add relations (they are like properties)
-    rel1 = Property("on the right", 0.8, 'd_lr', [0, 0.01, 0.5, 2], "Po prawej stronie od")
-    rel2 = Property("on he left", 0.8, 'd_lr', [-2, -0.5, -0.01, 0], "Po lewej stronie od")
-    rel3 = Property("above", 0.8, 'd_tb', [-2, -0.5, -0.01, 0], "Powyżej")
-    rel4 = Property("below", 0.8, 'd_tb', [0, 0.01, 0.5, 2], "Poniżej")
-    relations = [rel1, rel2, rel3, rel4]
+    # rel1 = Property("on the right", 0.8, 'd_lr', [0, 0.01, 0.5, 2], "is to the right of")
+    # rel2 = Property("on he left", 0.8, 'd_lr', [-2, -0.5, -0.01, 0], "is to the left of")
+    # rel3 = Property("above", 0.8, 'd_tb', [-2, -0.5, -0.01, 0], "is above")
+    # rel4 = Property("below", 0.8, 'd_tb', [0, 0.01, 0.5, 2], "is below")
+    # relations = [rel1, rel2, rel3, rel4]
 
 
     # Rules - name, saliency(0-1), prop1, prop2 - properties that need to be true to this rule to activate,
@@ -55,18 +88,22 @@ def location_description(field_height, field_width, objects):
             self.operator = operator
             self.sentence = sentence
 
+    for rule in rule_lines:
+        propParams = rule.split(',')
+        rules.append(Rule(propParams[0], properties[int(propParams[1])].name, properties[int(propParams[2])].name,
+                                   propParams[3],propParams[4], propParams[5].replace('\n', '')))
 
-    # Add rules
-    rule1 = Rule("center", 1, prop3.name, prop8.name, "min", "Na środku")
-    rule2 = Rule("top left corner", 1, prop1.name, prop6.name, "min", "Lewy, górny narożnik")
-    rule3 = Rule("top right corner", 1, prop5.name, prop10.name, "min", "Prawy, górny narożnik")
-    rule4 = Rule("bottom right corner", 1, prop5.name, prop10.name, "min", "Prawy, dolny narożnik")
-    rule5 = Rule("bottom left corner", 1, prop1.name, prop10.name, "min", "Lewy, dolny narożnik")
-    rule6 = Rule("top left", 1, prop2.name, prop7.name, "min", "Lewa, górna część")
-    rule7 = Rule("top right", 1, prop4.name, prop7.name, "min", "Prawa, górna część")
-    rule8 = Rule("bottom right", 1, prop4.name, prop9.name, "min", "Prawa, dolna część")
-    rule9 = Rule("bottom left", 1, prop2.name, prop9.name, "min", "Lewa, dolna część")
-    rules = [rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9]
+    # # Add rules
+    # rule1 = Rule("center", 1, properties[2].name, properties[7].name, "min", "is in the center.")
+    # rule2 = Rule("top left corner", 1, properties[0].name, properties[5].name, "min", "is int top-left corner.")
+    # rule3 = Rule("top right corner", 1, properties[4].name, properties[9].name, "min", "is in the top-right corner.")
+    # rule4 = Rule("bottom right corner", 1, properties[4].name, properties[9].name, "min", "is in the bottom-right corner.")
+    # rule5 = Rule("bottom left corner", 1, properties[0].name, properties[9].name, "min", "is in the bottom-left corner.")
+    # rule6 = Rule("top left", 1, properties[1].name, properties[6].name, "min", "is on the top-left side.")
+    # rule7 = Rule("top right", 1, properties[3].name, properties[6].name, "min", "is on the top-right side.")
+    # rule8 = Rule("bottom right", 1, properties[3].name, properties[8].name, "min", "is on the bottom-right side.")
+    # rule9 = Rule("bottom left", 1, properties[1].name, properties[8].name, "min", "is on the bottom-left side.")
+    # rules = [rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9]
 
 
     # Normalize objects properties by the size of the image
@@ -106,14 +143,14 @@ def location_description(field_height, field_width, objects):
 
     # Calculate membership y value based on x value and the membership function
     def membership_y_value(property, value):
-        if value < property.mem_values[0]:
+        if value < float(property.mem_values[0]):
             return 0
-        elif value < property.mem_values[1]:
-            return (value - property.mem_values[0]) / (property.mem_values[1] - property.mem_values[0])
-        elif value < property.mem_values[2]:
+        elif value < float(property.mem_values[1]):
+            return (value - float(property.mem_values[0])) / (float(property.mem_values[1]) - float(property.mem_values[0]))
+        elif value < float(property.mem_values[2]):
             return 1
-        elif value < property.mem_values[3]:
-            return (property.mem_values[3] - value) / (property.mem_values[3] - property.mem_values[2])
+        elif value < float(property.mem_values[3]):
+            return (float(property.mem_values[3]) - value) / (float(property.mem_values[3]) - float(property.mem_values[2]))
         else:
             return 0
 

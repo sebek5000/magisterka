@@ -1,0 +1,26 @@
+#properties:
+left edge,0.9,b_l,-2;-2;-1;-0.85,is by the left edge.
+left,0.8,b_l,-10;-0.9;-0.6;0,is on the left side.
+length center,0.9,c_lr,-0.2;-0.05;0.05;0.2,is in te middle of width.
+right,0.8,b_r,0;0.6;0.9;10,is on the right side.
+right edge,0.9,b_r,0.85;1;2;2,is by the right edge.
+top egde,0.7,b_t,-2;-2;-1;-0.85,is by the top edge.
+top,0.5,b_t,-10;-0.9;-0.6;0,is on the top side.
+center height,0.8,c_tb,-0.2;-0.05;0.05;0.2,is in the middle of height.
+bottom,0.5,b_b,0;0.6;0.9;10,is on the bottom side.
+bottom edge,0.7,b_b,0.85;1;2;2,is by the bottom edge.
+#relations:
+on the right,0.8,d_lr,0;0.01;0.5;2,is to the right of
+on he left,0.8,d_lr,-2;-0.5;-0.01;0,is to the left of
+above,0.8,d_tb,-2;-0.5;-0.01;0,is above
+below,0.8,d_tb,0;0.01;0.5;2,is below
+#rules:
+center,1,2,7,min,is in the center.
+top left corner,1,0,5,min,is int top-left corner.
+top right corner,1,4,9,min,is in the top-right corner.
+bottom right corner,1,4,9,min,is in the bottom-right corner.
+bottom left corner,1,0,9,min,is in the bottom-left corner.
+top left,1,1,6,min,is on the top-left side.
+top right,1,3,6,min,is on the top-right side.
+bottom right,1,3,8,min,is on the bottom-right side.
+bottom left,1,1,8,min,is on the bottom-left side.

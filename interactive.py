@@ -156,7 +156,7 @@ def delete():
     refresh_image()
 
 
-# TODO: change position of buttons
+# TODO: change position of buttons, https://stackoverflow.com/questions/2261191/how-can-i-put-2-buttons-next-to-each-other
 btn = Button(root, text='góra', command=up).pack(side = LEFT)
 btn1 = Button(root, text='dół', command=down).pack(side = LEFT)
 btn2 = Button(root, text='lewo', command=left).pack(side = LEFT)
