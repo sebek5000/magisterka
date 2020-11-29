@@ -2,6 +2,8 @@
 # described in a json file.
 
 import common
+
+
 # read_json = common.read_objects_from_json('json/street.txt')
 # field_height = read_json[0]
 # field_width = read_json[1]
@@ -20,11 +22,11 @@ def location_description(field_height, field_width, objects):
             self.mem_values = mem_values
             self.sentence = sentence
 
-    f = open("settings/starting.txt", "r")
+    f = open("settings/test.txt", "r")
     property_lines = []
     relation_lines = []
     rule_lines = []
-    kind_of_predicate = -1 # 0 - property, 1- relation, 2 - rule
+    kind_of_predicate = -1  # 0 - property, 1- relation, 2 - rule
     for x in f:
         if x.startswith('#'):
             kind_of_predicate = kind_of_predicate + 1
@@ -48,11 +50,7 @@ def location_description(field_height, field_width, objects):
     for rel in relation_lines:
         propParams = rel.split(',')
         relations.append(Property(propParams[0], float(propParams[1]), propParams[2],
-                                   propParams[3].split(';'), propParams[4].replace('\n', '')))
-
-
-
-
+                                  propParams[3].split(';'), propParams[4].replace('\n', '')))
 
     # # Add properties:
     # prop1 = Property("left edge", 0.9, 'b_l', [-2, -2, -1, -0.85], "is by the left edge.")
@@ -74,7 +72,6 @@ def location_description(field_height, field_width, objects):
     # rel4 = Property("below", 0.8, 'd_tb', [0, 0.01, 0.5, 2], "is below")
     # relations = [rel1, rel2, rel3, rel4]
 
-
     # Rules - name, saliency(0-1), prop1, prop2 - properties that need to be true to this rule to activate,
     # operator - operator that joins two properties, sentence - the description
     # TODO I assumed that all are trapezoid membership function
@@ -90,8 +87,8 @@ def location_description(field_height, field_width, objects):
 
     for rule in rule_lines:
         propParams = rule.split(',')
-        rules.append(Rule(propParams[0], properties[int(propParams[1])].name, properties[int(propParams[2])].name,
-                                   propParams[3],propParams[4], propParams[5].replace('\n', '')))
+        rules.append(Rule(propParams[0], int(propParams[1]), properties[int(propParams[2])].name,
+                          properties[int(propParams[3])].name, propParams[4], propParams[5].replace('\n', '')))
 
     # # Add rules
     # rule1 = Rule("center", 1, properties[2].name, properties[7].name, "min", "is in the center.")
@@ -105,7 +102,6 @@ def location_description(field_height, field_width, objects):
     # rule9 = Rule("bottom left", 1, properties[1].name, properties[8].name, "min", "is on the bottom-left side.")
     # rules = [rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9]
 
-
     # Normalize objects properties by the size of the image
     for obj in objects:
         obj.boundary_left = 2 * obj.x / field_width - 1
@@ -113,7 +109,6 @@ def location_description(field_height, field_width, objects):
         obj.boundary_top = 2 * obj.y / field_height - 1
         obj.boundary_bottom = 2 * (obj.y + obj.height) / field_height - 1
         obj.size = (obj.width / field_width) * (obj.height / field_height)  # saliency
-
 
     # Calculate membership function x value based on normalized properties of the object
     def membership_function_x_value(type, obj, obj2):
@@ -140,20 +135,20 @@ def location_description(field_height, field_width, objects):
             print("Something went wrong during calculating membership x value;/")
             return -7100
 
-
     # Calculate membership y value based on x value and the membership function
     def membership_y_value(property, value):
         if value < float(property.mem_values[0]):
             return 0
         elif value < float(property.mem_values[1]):
-            return (value - float(property.mem_values[0])) / (float(property.mem_values[1]) - float(property.mem_values[0]))
+            return (value - float(property.mem_values[0])) / (
+                        float(property.mem_values[1]) - float(property.mem_values[0]))
         elif value < float(property.mem_values[2]):
             return 1
         elif value < float(property.mem_values[3]):
-            return (float(property.mem_values[3]) - value) / (float(property.mem_values[3]) - float(property.mem_values[2]))
+            return (float(property.mem_values[3]) - value) / (
+                        float(property.mem_values[3]) - float(property.mem_values[2]))
         else:
             return 0
-
 
     # Membership Value Function of an object to specific property
     obj_prop = []
@@ -175,7 +170,6 @@ def location_description(field_height, field_width, objects):
             tempOutside.append(tempInside)
         obj_rel.append(tempOutside)
 
-
     # Add predicates - name, certainty factor, is_used, number of object, number of second object (for relations only),
     # number of property/relation, membership value
     pred = []
@@ -193,8 +187,6 @@ def location_description(field_height, field_width, objects):
                             obj_rel[j][i][k]]
                     pred.append(temp)
 
-    print(pred)
-
     for i in range(len(rules)):
         for j in range(len(pred)):
             if pred[j][0] == rules[i].prop1:
@@ -203,13 +195,22 @@ def location_description(field_height, field_width, objects):
                     if pred[k][0] == rules[i].prop2 and pred[k][3] == obj_found:
                         if pred[j][6] != 0 and pred[k][6] != 0:
                             ruleobj_cf = min(pred[j][6], pred[k][6])  # TODO Na razie zawsze jest tam minimum
-                            temp = [rules[i].name, ruleobj_cf * objects[obj_found].size * rules[i].saliency, 0, obj_found,
+                            temp = [rules[i].name, ruleobj_cf * objects[obj_found].size * rules[i].saliency, 0,
+                                    obj_found,
                                     -2, i, ruleobj_cf]
                             pred.append(temp)
 
     # Sort
     pred.sort(key=lambda p: p[1], reverse=True)
-    print(pred)
+    print("sorted predicates:")
+    for pr in pred:
+        if pr[4] == -1:
+            print(objects[pr[3]].name + " " + properties[pr[5]].sentence + " CF: " + str(pr[1]))
+        elif pr[4] == -2:
+            print(objects[pr[3]].name + " " + rules[pr[5]].sentence + " CF: " + str(pr[1]))
+        else:
+            print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(
+                pr[1]))
 
     # Predicate selection
     used = []
@@ -230,7 +231,6 @@ def location_description(field_height, field_width, objects):
         if pred[i][1] > 0 and pred[i][2] == 1:
             pred_out.append(pred[i])
 
-
     # Print sentences
     # TODO make them more like a sentence
     desc = []
@@ -245,7 +245,7 @@ def location_description(field_height, field_width, objects):
         desc.append(sentence)
     TEXT = ''
     for description in desc:
-        print(description)
+        # print(description)
         TEXT = TEXT + description + '\n'
     return TEXT
 
