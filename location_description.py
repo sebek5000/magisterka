@@ -173,6 +173,7 @@ def location_description(field_height, field_width, objects):
     # Add predicates - name, certainty factor, is_used, number of object, number of second object (for relations only),
     # number of property/relation, membership value
     pred = []
+    rel_pred = []
     for i in range(len(objects)):
         for j in range(len(properties)):
             if obj_prop[j][i] > 0:
@@ -185,7 +186,7 @@ def location_description(field_height, field_width, objects):
                 if obj_rel[j][i][k] > 0:
                     temp = [relations[j].name, obj_rel[j][i][k] * objects[i].size * relations[j].saliency, 0, i, k, j,
                             obj_rel[j][i][k]]
-                    pred.append(temp)
+                    rel_pred.append(temp)
 
     for i in range(len(rules)):
         for j in range(len(pred)):
@@ -199,6 +200,26 @@ def location_description(field_height, field_width, objects):
                                     obj_found,
                                     -2, i, ruleobj_cf]
                             pred.append(temp)
+    # Sort
+    rel_pred.sort(key=lambda p: p[1], reverse=True)
+    rel_pred_out = []
+    print("sorted rel predicates:")
+    for pr in rel_pred:#pr[5]-> numer relacji
+        for pr2 in rel_pred:
+            if pr[5] == 0 or pr[5] == 1:
+                if pr2[5] == 4 and pr2[3] == pr[3] and pr2[4] == pr[4]:
+                    # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
+                    #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
+                    #Minimum jednak
+                    pr[1] = min(pr[1], pr2[1])
+                    pred.append(pr)
+            if pr[5] == 2 or pr[5] == 3:
+                if pr2[5] == 5 and pr2[3] == pr[3] and pr2[4] == pr[4]:
+                    # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
+                    #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
+                    pr[1] = min(pr[1], pr2[1])
+                    pred.append(pr)
+                    # print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]))
 
     # Sort
     pred.sort(key=lambda p: p[1], reverse=True)
@@ -218,14 +239,16 @@ def location_description(field_height, field_width, objects):
         used.append(0)
 
     for i in range(len(pred)):
-        if pred[i][4] < 0:
-            if used[pred[i][3]] < 1:  # To może być zmienna
-                used[pred[i][3]] = used[pred[i][3]] + 1
-                pred[i][2] = 1
-        else:
-            if used[pred[i][3]] < 1 and used[pred[i][4]] == 1:
-                used[pred[i][3]] = used[pred[i][3]] + 1
-                pred[i][2] = 1
+        # if pred[i][4] < 0:
+        if used[pred[i][3]] < 1:  # To może być zmienna
+           used[pred[i][3]] = used[pred[i][3]] + 1
+           pred[i][2] = 1
+
+        #TODO: what to do with the opposite rule?
+        # else:
+        #     if used[pred[i][3]] < 1:
+        #         used[pred[i][3]] = used[pred[i][3]] + 1
+        #         pred[i][2] = 1
     pred_out = []
     for i in range(len(pred)):
         if pred[i][1] > 0 and pred[i][2] == 1:
@@ -235,11 +258,11 @@ def location_description(field_height, field_width, objects):
     # TODO make them more like a sentence
     desc = []
     for i in range(len(pred_out)):
-        if pred_out[i][4] == -1:
+        if pred_out[i][4] == -1: #predicate
             sentence = objects[pred_out[i][3]].name + " " + properties[pred_out[i][5]].sentence
-        elif pred_out[i][4] == -2:
+        elif pred_out[i][4] == -2: #rule
             sentence = objects[pred_out[i][3]].name + " " + rules[pred_out[i][5]].sentence
-        else:
+        else: #relation
             sentence = objects[pred_out[i][3]].name + " " + relations[pred_out[i][5]].sentence + " " + objects[
                 pred_out[i][4]].name
         desc.append(sentence)
