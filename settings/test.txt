@@ -1,0 +1,34 @@
+#properties:
+left edge,0.9,b_l,-2;-2;-1;-0.85,is by the left edge.
+left,0.8,b_l,-10;-0.9;-0.6;0,is on the left side.
+length center,0.9,c_lr,-0.2;-0.05;0.05;0.2,is in te middle of width.
+right,0.8,b_r,0;0.6;0.9;10,is on the right side.
+right edge,0.9,b_r,0.85;1;2;2,is by the right edge.
+top egde,0.9,b_t,-2;-2;-1;-0.85,is by the top edge.
+top,0.8,b_t,-10;-0.9;-0.6;0,is on the top side.
+center height,0.9,c_tb,-0.2;-0.05;0.05;0.2,is in the middle of height.
+bottom,0.8,b_b,0;0.6;0.9;10,is on the bottom side.
+bottom edge,0.9,b_b,0.85;1;2;2,is by the bottom edge.
+#relations: (They are calculated in code, so there is little possibility to add new ones), only 4 upper are used in description
+#rules:
+center,1,2,7,min,is in the center.
+top left corner,1,0,5,min,is in the top-left corner.
+top right corner,1,4,9,min,is in the top-right corner.
+bottom right corner,1,4,9,min,is in the bottom-right corner.
+bottom left corner,1,0,9,min,is in the bottom-left corner.
+top left,1,1,6,min,is on the top-left side.
+top right,1,3,6,min,is on the top-right side.
+bottom right,1,3,8,min,is on the bottom-right side.
+bottom left,1,1,8,min,is on the bottom-left side.
+width,1,1,3,min,is on the whole width.
+width,1,0,3,min,is on the whole width.
+width,1,0,4,min,is on the whole width.
+width,1,1,4,min,is on the whole width.
+height,1,6,8,min,is ont the whole height.
+height,1,6,9,min,is ont the whole height.
+height,1,5,8,min,is ont the whole height.
+height,1,5,9,min,is ont the whole height.
+#right,1,10,14,min,RIGHT
+#left,1,11,14,min,LEFT
+#down,1,13,15,min,DOWN
+#up,1,12,15,min,UP

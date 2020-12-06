@@ -141,12 +141,12 @@ def location_description(field_height, field_width, objects):
             return 0
         elif value < float(property.mem_values[1]):
             return (value - float(property.mem_values[0])) / (
-                        float(property.mem_values[1]) - float(property.mem_values[0]))
+                    float(property.mem_values[1]) - float(property.mem_values[0]))
         elif value < float(property.mem_values[2]):
             return 1
         elif value < float(property.mem_values[3]):
             return (float(property.mem_values[3]) - value) / (
-                        float(property.mem_values[3]) - float(property.mem_values[2]))
+                    float(property.mem_values[3]) - float(property.mem_values[2]))
         else:
             return 0
 
@@ -204,13 +204,13 @@ def location_description(field_height, field_width, objects):
     rel_pred.sort(key=lambda p: p[1], reverse=True)
     rel_pred_out = []
     print("sorted rel predicates:")
-    for pr in rel_pred:#pr[5]-> numer relacji
+    for pr in rel_pred:  # pr[5]-> numer relacji
         for pr2 in rel_pred:
             if pr[5] == 0 or pr[5] == 1:
                 if pr2[5] == 4 and pr2[3] == pr[3] and pr2[4] == pr[4]:
                     # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
                     #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
-                    #Minimum jednak
+                    # Minimum jednak
                     pr[1] = min(pr[1], pr2[1])
                     pred.append(pr)
             if pr[5] == 2 or pr[5] == 3:
@@ -233,18 +233,41 @@ def location_description(field_height, field_width, objects):
             print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(
                 pr[1]))
 
+    def kindOfPredicate(pred):
+        if pred[4] == -1:  # property
+            if properties[pred[5]].argument_type == 'b_l' or properties[pred[5]].argument_type == 'c_lr' or properties[
+                    pred[5]].argument_type == 'b_r':
+                return 'X'
+        if pred[4] == -2:  # rule
+            if rules[pred[5]].name == 'width':
+                return 'X'
+            if rules[pred[5]].name == 'height':
+                return 'Y'
+            return 'BOTH'
+        return 'Y'
+
     # Predicate selection
-    used = []
+    usedX = []
+    usedY = []
     for obj in objects:
-        used.append(0)
+        usedX.append(0)
+        usedY.append(0)
 
     for i in range(len(pred)):
-        # if pred[i][4] < 0:
-        if used[pred[i][3]] < 1:  # To może być zmienna
-           used[pred[i][3]] = used[pred[i][3]] + 1
-           pred[i][2] = 1
-
-        #TODO: what to do with the opposite rule?
+        if kindOfPredicate(pred[i]) == 'BOTH':
+            if usedX[pred[i][3]] < 1 and usedY[pred[i][3]] < 1:
+                usedX[pred[i][3]] = usedX[pred[i][3]] + 1
+                usedY[pred[i][3]] = usedY[pred[i][3]] + 1
+                pred[i][2] = 1
+        elif kindOfPredicate(pred[i]) == 'X':
+            if usedX[pred[i][3]] < 1:
+                usedX[pred[i][3]] = usedX[pred[i][3]] + 1
+                pred[i][2] = 1
+        else:
+            if usedY[pred[i][3]] < 1:
+                usedY[pred[i][3]] = usedY[pred[i][3]] + 1
+                pred[i][2] = 1
+        # TODO: what to do with the opposite rule?
         # else:
         #     if used[pred[i][3]] < 1:
         #         used[pred[i][3]] = used[pred[i][3]] + 1
@@ -258,11 +281,11 @@ def location_description(field_height, field_width, objects):
     # TODO make them more like a sentence
     desc = []
     for i in range(len(pred_out)):
-        if pred_out[i][4] == -1: #predicate
+        if pred_out[i][4] == -1:  # predicate
             sentence = objects[pred_out[i][3]].name + " " + properties[pred_out[i][5]].sentence
-        elif pred_out[i][4] == -2: #rule
+        elif pred_out[i][4] == -2:  # rule
             sentence = objects[pred_out[i][3]].name + " " + rules[pred_out[i][5]].sentence
-        else: #relation
+        else:  # relation
             sentence = objects[pred_out[i][3]].name + " " + relations[pred_out[i][5]].sentence + " " + objects[
                 pred_out[i][4]].name
         desc.append(sentence)
