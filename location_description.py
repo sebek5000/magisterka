@@ -9,6 +9,8 @@ import common
 # field_width = read_json[1]
 # objects = read_json[2]
 
+settings_file = "settings/test.txt"
+
 def location_description(field_height, field_width, objects):
     # Properties - name, saliency(0-1), argument_type, mem_values - values for the membership function,
     # sentence - the description
@@ -22,7 +24,7 @@ def location_description(field_height, field_width, objects):
             self.mem_values = mem_values
             self.sentence = sentence
 
-    f = open("settings/test.txt", "r")
+    f = open(settings_file, "r")
     property_lines = []
     relation_lines = []
     rule_lines = []
@@ -183,7 +185,7 @@ def location_description(field_height, field_width, objects):
 
         for k in range(len(objects)):
             for j in range(len(relations)):
-                if obj_rel[j][i][k] > 0:
+                if obj_rel[j][i][k] > 0 and i != k:
                     temp = [relations[j].name, obj_rel[j][i][k] * objects[i].size * relations[j].saliency, 0, i, k, j,
                             obj_rel[j][i][k]]
                     rel_pred.append(temp)
@@ -203,24 +205,25 @@ def location_description(field_height, field_width, objects):
     # Sort
     rel_pred.sort(key=lambda p: p[1], reverse=True)
     rel_pred_out = []
-    print("sorted rel predicates:")
-    for pr in rel_pred:  # pr[5]-> numer relacji
-        for pr2 in rel_pred:
-            if pr[5] == 0 or pr[5] == 1:
-                if pr2[5] == 4 and pr2[3] == pr[3] and pr2[4] == pr[4]:
-                    # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
-                    #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
-                    # Minimum jednak
-                    pr[1] = min(pr[1], pr2[1])
-                    pred.append(pr)
-            if pr[5] == 2 or pr[5] == 3:
-                if pr2[5] == 5 and pr2[3] == pr[3] and pr2[4] == pr[4]:
-                    # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
-                    #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
-                    pr[1] = min(pr[1], pr2[1])
-                    pred.append(pr)
-                    # print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]))
-
+    #***************************Relations are to be done outside
+#     print("sorted rel predicates:")
+#     for pr in rel_pred:  # pr[5]-> numer relacji
+#         for pr2 in rel_pred:
+#             if pr[5] == 0 or pr[5] == 1:
+#                 if pr2[5] == 4 and pr2[3] == pr[3] and pr2[4] == pr[4]:
+#                     # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
+#                     #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
+#                     # Minimum jednak
+#                     pr[1] = min(pr[1], pr2[1])
+#                     pred.append(pr)
+#             if pr[5] == 2 or pr[5] == 3:
+#                 if pr2[5] == 5 and pr2[3] == pr[3] and pr2[4] == pr[4]:
+#                     # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
+#                     #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
+#                     pr[1] = min(pr[1], pr2[1])
+#                     pred.append(pr)
+#                     # print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]))
+# #*****************************
     # Sort
     pred.sort(key=lambda p: p[1], reverse=True)
     print("sorted predicates:")
@@ -285,14 +288,30 @@ def location_description(field_height, field_width, objects):
             sentence = objects[pred_out[i][3]].name + " " + properties[pred_out[i][5]].sentence
         elif pred_out[i][4] == -2:  # rule
             sentence = objects[pred_out[i][3]].name + " " + rules[pred_out[i][5]].sentence
-        else:  # relation
+        else:  # relation TODO:Usuń?
             sentence = objects[pred_out[i][3]].name + " " + relations[pred_out[i][5]].sentence + " " + objects[
                 pred_out[i][4]].name
         desc.append(sentence)
+
+    usedRel = []
+    for obj in objects:
+        usedRel.append(0)
+
+    #relations:
+    for i in range(len(rel_pred)):
+        print("REL: " + str(rel_pred[i][1]) )
+        if rel_pred[i][1] < 0.07: #TODO What is a good value for this point?
+            break
+        if usedRel[rel_pred[i][3]] == 1 and usedRel[rel_pred[i][4]] == 1:
+            continue
+        sentence = objects[rel_pred[i][3]].name + " " + relations[rel_pred[i][5]].sentence + " " + objects[
+            rel_pred[i][4]].name
+        usedRel[rel_pred[i][3]] = 1
+        usedRel[rel_pred[i][4]] = 1
+        desc.append(sentence)
+
     TEXT = ''
     for description in desc:
         # print(description)
         TEXT = TEXT + description + '\n'
     return TEXT
-
-# location_description(field_height, field_width, objects)

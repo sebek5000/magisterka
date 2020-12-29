@@ -29,7 +29,7 @@ img = ImageTk.PhotoImage(img)
 panel = Label(root, image=img)
 panel.image = img
 # text field, https://effbot.org/tkinterbook/pack.htm
-text_widget = Label(root, text='DUPA')
+text_widget = Label(root, text='TEST')
 text_widget.pack(side=BOTTOM)
 
 # TODO RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface
