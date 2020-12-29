@@ -3,12 +3,6 @@
 
 import common
 
-
-# read_json = common.read_objects_from_json('json/street.txt')
-# field_height = read_json[0]
-# field_width = read_json[1]
-# objects = read_json[2]
-
 settings_file = "settings/test.txt"
 
 def location_description(field_height, field_width, objects):
@@ -54,26 +48,6 @@ def location_description(field_height, field_width, objects):
         relations.append(Property(propParams[0], float(propParams[1]), propParams[2],
                                   propParams[3].split(';'), propParams[4].replace('\n', '')))
 
-    # # Add properties:
-    # prop1 = Property("left edge", 0.9, 'b_l', [-2, -2, -1, -0.85], "is by the left edge.")
-    # prop2 = Property("left", 0.8, 'b_l', [-10, -0.9, -0.6, 0], "is on the left side.")
-    # prop3 = Property("length center", 0.9, 'c_lr', [-0.2, -0.05, 0.05, 0.2], "is in te middle of width.")
-    # prop4 = Property("right", 0.8, 'b_r', [0, 0.6, 0.9, 10], "is on the right side.")
-    # prop5 = Property("right edge", 0.9, 'b_r', [0.85, 1, 2, 2], "is by the right edge.")
-    # prop6 = Property("top egde", 0.7, 'b_t', [-2, -2, -1, -0.85], "is by the top edge.")
-    # prop7 = Property("top", 0.5, 'b_t', [-10, -0.9, -0.6, 0], "is on the top side.")
-    # prop8 = Property("center height", 0.8, 'c_tb', [-0.2, -0.05, 0.05, 0.2], "is in the middle of height.")
-    # prop9 = Property("bottom", 0.5, 'b_b', [0, 0.6, 0.9, 10], "is on the bottom side.")
-    # prop10 = Property("bottom edge", 0.7, 'b_b', [0.85, 1, 2, 2], "is by the bottom edge.")
-    # properties = [prop1, prop2, prop3, prop4, prop5, prop6, prop7, prop8, prop9, prop10]
-
-    # Add relations (they are like properties)
-    # rel1 = Property("on the right", 0.8, 'd_lr', [0, 0.01, 0.5, 2], "is to the right of")
-    # rel2 = Property("on he left", 0.8, 'd_lr', [-2, -0.5, -0.01, 0], "is to the left of")
-    # rel3 = Property("above", 0.8, 'd_tb', [-2, -0.5, -0.01, 0], "is above")
-    # rel4 = Property("below", 0.8, 'd_tb', [0, 0.01, 0.5, 2], "is below")
-    # relations = [rel1, rel2, rel3, rel4]
-
     # Rules - name, saliency(0-1), prop1, prop2 - properties that need to be true to this rule to activate,
     # operator - operator that joins two properties, sentence - the description
     # TODO I assumed that all are trapezoid membership function
@@ -92,17 +66,6 @@ def location_description(field_height, field_width, objects):
         rules.append(Rule(propParams[0], int(propParams[1]), properties[int(propParams[2])].name,
                           properties[int(propParams[3])].name, propParams[4], propParams[5].replace('\n', '')))
 
-    # # Add rules
-    # rule1 = Rule("center", 1, properties[2].name, properties[7].name, "min", "is in the center.")
-    # rule2 = Rule("top left corner", 1, properties[0].name, properties[5].name, "min", "is int top-left corner.")
-    # rule3 = Rule("top right corner", 1, properties[4].name, properties[9].name, "min", "is in the top-right corner.")
-    # rule4 = Rule("bottom right corner", 1, properties[4].name, properties[9].name, "min", "is in the bottom-right corner.")
-    # rule5 = Rule("bottom left corner", 1, properties[0].name, properties[9].name, "min", "is in the bottom-left corner.")
-    # rule6 = Rule("top left", 1, properties[1].name, properties[6].name, "min", "is on the top-left side.")
-    # rule7 = Rule("top right", 1, properties[3].name, properties[6].name, "min", "is on the top-right side.")
-    # rule8 = Rule("bottom right", 1, properties[3].name, properties[8].name, "min", "is on the bottom-right side.")
-    # rule9 = Rule("bottom left", 1, properties[1].name, properties[8].name, "min", "is on the bottom-left side.")
-    # rules = [rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9]
 
     # Normalize objects properties by the size of the image
     for obj in objects:
@@ -111,6 +74,8 @@ def location_description(field_height, field_width, objects):
         obj.boundary_top = 2 * obj.y / field_height - 1
         obj.boundary_bottom = 2 * (obj.y + obj.height) / field_height - 1
         obj.size = (obj.width / field_width) * (obj.height / field_height)  # saliency
+        obj.width_center = (obj.boundary_right + obj.boundary_left)/2
+        obj.height_center = (obj.boundary_bottom + obj.boundary_top)/2
 
     # Calculate membership function x value based on normalized properties of the object
     def membership_function_x_value(type, obj, obj2):
@@ -130,6 +95,29 @@ def location_description(field_height, field_width, objects):
             return (obj.boundary_right + obj.boundary_left) / 2 - (obj2.boundary_right + obj2.boundary_left) / 2
         elif type == 'd_tb':  # distance between height centroids
             return (obj.boundary_top + obj.boundary_bottom) / 2 - (obj2.boundary_top + obj2.boundary_bottom) / 2
+        elif type == 'd_left':  # distance between A.right and B.left
+            if obj2.boundary_right < obj.boundary_left or (obj.boundary_left < obj2.boundary_left and obj.boundary_right > obj2.boundary_right):
+                return -5000
+            return abs(obj2.boundary_left - obj.boundary_right) + abs(obj.height_center - obj2.height_center)
+        elif type == 'd_right':  # distance between A.left and B.right
+            if obj.boundary_left < obj2.boundary_right or (
+                    obj.boundary_left < obj2.boundary_left and obj.boundary_right > obj2.boundary_right):
+                return -5000
+            return abs(obj.boundary_left - obj2.boundary_right) + abs(obj.height_center - obj2.height_center)
+        elif type == 'd_below' :  # distance between A.top and B.down
+            if obj.boundary_bottom < obj2.boundary_top or (
+                    obj.boundary_top < obj2.boundary_top and obj.boundary_bottom > obj2.boundary_bottom):
+                return -5000
+            return abs(obj.boundary_top - obj2.boundary_bottom) + abs(obj.width_center - obj2.width_center)
+        elif type == 'd_above':  # distance between B.top and A.down
+            if obj.boundary_top > obj2.boundary_bottom or (
+                    obj.boundary_top < obj2.boundary_top and obj.boundary_bottom > obj2.boundary_bottom):
+                return -5000
+            return abs(obj2.boundary_top - obj.boundary_bottom) + abs(obj.width_center - obj2.width_center)
+        elif type == 'd_inside':
+            if obj2.boundary_left > obj.boundary_left or obj2.boundary_right < obj.boundary_right or obj2.boundary_top > obj.boundary_top or obj2.boundary_bottom < obj.boundary_bottom :
+                return -5000
+            return 0 #TODO
         elif type == 'd':
             print("Not supported")
             return 7000
@@ -186,8 +174,8 @@ def location_description(field_height, field_width, objects):
         for k in range(len(objects)):
             for j in range(len(relations)):
                 if obj_rel[j][i][k] > 0 and i != k:
-                    temp = [relations[j].name, obj_rel[j][i][k] * objects[i].size * relations[j].saliency, 0, i, k, j,
-                            obj_rel[j][i][k]]
+                    temp = [relations[j].name, obj_rel[j][i][k]* relations[j].saliency, 0, i, k, j, obj_rel[j][i][k]]
+                    # deleted multiplying by size of object in relations
                     rel_pred.append(temp)
 
     for i in range(len(rules)):
@@ -204,26 +192,10 @@ def location_description(field_height, field_width, objects):
                             pred.append(temp)
     # Sort
     rel_pred.sort(key=lambda p: p[1], reverse=True)
-    rel_pred_out = []
-    #***************************Relations are to be done outside
-#     print("sorted rel predicates:")
-#     for pr in rel_pred:  # pr[5]-> numer relacji
-#         for pr2 in rel_pred:
-#             if pr[5] == 0 or pr[5] == 1:
-#                 if pr2[5] == 4 and pr2[3] == pr[3] and pr2[4] == pr[4]:
-#                     # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
-#                     #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
-#                     # Minimum jednak
-#                     pr[1] = min(pr[1], pr2[1])
-#                     pred.append(pr)
-#             if pr[5] == 2 or pr[5] == 3:
-#                 if pr2[5] == 5 and pr2[3] == pr[3] and pr2[4] == pr[4]:
-#                     # print("pomnożę: " + objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]) +
-#                     #       " i " + objects[pr2[3]].name + " " + relations[pr2[5]].sentence + " " + objects[pr2[4]].name + " CF: " + str(pr2[1]))
-#                     pr[1] = min(pr[1], pr2[1])
-#                     pred.append(pr)
-#                     # print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]))
-# #*****************************
+
+    for pr in rel_pred:  # pr[5]-> numer relacji
+        print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]))
+
     # Sort
     pred.sort(key=lambda p: p[1], reverse=True)
     print("sorted predicates:")
@@ -270,11 +242,6 @@ def location_description(field_height, field_width, objects):
             if usedY[pred[i][3]] < 1:
                 usedY[pred[i][3]] = usedY[pred[i][3]] + 1
                 pred[i][2] = 1
-        # TODO: what to do with the opposite rule?
-        # else:
-        #     if used[pred[i][3]] < 1:
-        #         used[pred[i][3]] = used[pred[i][3]] + 1
-        #         pred[i][2] = 1
     pred_out = []
     for i in range(len(pred)):
         if pred[i][1] > 0 and pred[i][2] == 1:
@@ -300,9 +267,10 @@ def location_description(field_height, field_width, objects):
     #relations:
     for i in range(len(rel_pred)):
         print("REL: " + str(rel_pred[i][1]) )
-        if rel_pred[i][1] < 0.07: #TODO What is a good value for this point?
-            break
-        if usedRel[rel_pred[i][3]] == 1 and usedRel[rel_pred[i][4]] == 1:
+        # if rel_pred[i][1] < 0.07: #TODO What is a good value for this point?
+        #     break
+        # Decided to use every object once (at least if there is an even number of them)
+        if usedRel[rel_pred[i][3]] == 1 or usedRel[rel_pred[i][4]] == 1:
             continue
         sentence = objects[rel_pred[i][3]].name + " " + relations[rel_pred[i][5]].sentence + " " + objects[
             rel_pred[i][4]].name

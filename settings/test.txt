@@ -9,7 +9,12 @@ top,0.8,b_t,-10;-0.9;-0.6;0,is on the top side.
 center height,0.9,c_tb,-0.2;-0.05;0.05;0.2,is in the middle of height.
 bottom,0.8,b_b,0;0.6;0.9;10,is on the bottom side.
 bottom edge,0.9,b_b,0.85;1;2;2,is by the bottom edge.
-#relations: (They are calculated in code, so there is little possibility to add new ones), only 4 upper are used in description
+#relations: 
+on the right,0.8,d_right,-1;-0.0000001;0.0000001;1,is to the right of
+on the left,0.8,d_left,-1;-0.0000001;0.0000001;1,is to the left of
+above,0.8,d_above,-1;-0.0000001;0.0000001;1,is above
+below,0.8,d_below,-1;-0.0000001;0.0000001;1,is below
+inside,0.8,d_inside,-1;-0.0000001;0.0000001;1,is inside
 #rules:
 center,1,2,7,min,is in the center.
 top left corner,1,0,5,min,is in the top-left corner.
@@ -28,7 +33,3 @@ height,1,6,8,min,is ont the whole height.
 height,1,6,9,min,is ont the whole height.
 height,1,5,8,min,is ont the whole height.
 height,1,5,9,min,is ont the whole height.
-#right,1,10,14,min,RIGHT
-#left,1,11,14,min,LEFT
-#down,1,13,15,min,DOWN
-#up,1,12,15,min,UP
