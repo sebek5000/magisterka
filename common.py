@@ -9,6 +9,8 @@ class Object:
         self.y = float(y)
         self.width = float(width)
         self.height = float(height)
+        self.width_center = (self.x + self.width)/2
+        self.height_center = (self.y + self.height)/2
 
 
 # Read height and width of image and objects from json file

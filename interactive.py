@@ -7,13 +7,15 @@ from matplotlib.ticker import NullLocator
 from tkinter import *
 from PIL import ImageTk, Image
 
+
+json_file = 'json/interactive.txt'
 size_of_movement = 100 # how much to move up, left, up or down the object
 percentage_of_size_change = 10 # how much enlarge, reduce the object
 chosen_object = 0 # currently chosen object's index
 new_name = "new_object" # name for new object
 
 # Read starting "picture" from json
-read_json = common.read_objects_from_json('json/interactive.txt')
+read_json = common.read_objects_from_json(json_file)
 field_height = read_json[0]
 field_width = read_json[1]
 objects = read_json[2]
