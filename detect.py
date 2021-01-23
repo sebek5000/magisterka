@@ -22,7 +22,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.ticker import NullLocator
 
-if __name__ == "__main__":
+
+def detect():
     parser = argparse.ArgumentParser()
     parser.add_argument("--image_folder", type=str, default="data/samples", help="path to dataset")
     parser.add_argument("--model_def", type=str, default="config/yolov3.cfg", help="path to model definition file")
@@ -96,7 +97,7 @@ if __name__ == "__main__":
     print("\nSaving images:")
     # Iterate through images and save plot of detections
     for img_i, (path, detections) in enumerate(zip(imgs, img_detections)):
-        #Getting width and height of the image
+        # Getting width and height of the image
         im = Image.open(path.replace("\\", "/"))
         width = im.width
         height = im.height
@@ -122,11 +123,9 @@ if __name__ == "__main__":
             data = {}
             data['objects'] = []
             for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections:
-                #print("\t+ Label: %s, Conf: %.5f" % (classes[int(cls_pred)], cls_conf.item()))
                 with open("data.txt", "a") as text_file:
                     text_file.write(" %s at %.5f, %.5f, %.5f, %.5f \n" % (classes[int(cls_pred)], x1, x2, y1, y2))
                 print(" %s at %.5f, %.5f, %.5f, %.5f" % (classes[int(cls_pred)], x1, x2, y1, y2))
-
 
                 box_w = x2 - x1
                 box_h = y2 - y1

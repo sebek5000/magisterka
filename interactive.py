@@ -119,7 +119,7 @@ def next():
     draw()
     refresh_image()
 
-# TODO think about have constant middle, not upper-left corner when changing size
+
 def enlarge():
     objects[chosen_object].width = objects[chosen_object].width * ((100 + percentage_of_size_change)/100)
     objects[chosen_object].height = objects[chosen_object].height * ((100 + percentage_of_size_change) / 100)
@@ -158,7 +158,6 @@ def delete():
     refresh_image()
 
 
-# TODO: change position of buttons, https://stackoverflow.com/questions/2261191/how-can-i-put-2-buttons-next-to-each-other
 btn = Button(root, text='góra', command=up).pack(side = LEFT)
 btn1 = Button(root, text='dół', command=down).pack(side = LEFT)
 btn2 = Button(root, text='lewo', command=left).pack(side = LEFT)

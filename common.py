@@ -1,5 +1,6 @@
 import json
 
+
 # Objects that are represented by bounding boxes in the picture, x and y are coordinates of the upper left vertex,
 # name is the label of the class
 class Object:

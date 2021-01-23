@@ -5,11 +5,11 @@ import common
 
 settings_file = "settings/test.txt"
 
+
 def location_description(field_height, field_width, objects):
     # Properties - name, saliency(0-1), argument_type, mem_values - values for the membership function,
     # sentence - the description
-    # TODO I assumed that all are trapezoid membership function
-    # TODO change description of those properties
+    # assumed that all are trapezoid membership function
     class Property:
         def __init__(self, name, saliency, argument_type, mem_values, sentence):
             self.name = name
@@ -50,8 +50,7 @@ def location_description(field_height, field_width, objects):
 
     # Rules - name, saliency(0-1), prop1, prop2 - properties that need to be true to this rule to activate,
     # operator - operator that joins two properties, sentence - the description
-    # TODO I assumed that all are trapezoid membership function
-    # TODO change description of those properties
+    # assumed that all are trapezoid membership function
     class Rule:
         def __init__(self, name, saliency, prop1, prop2, operator, sentence):
             self.name = name
@@ -65,7 +64,6 @@ def location_description(field_height, field_width, objects):
         propParams = rule.split(',')
         rules.append(Rule(propParams[0], int(propParams[1]), properties[int(propParams[2])].name,
                           properties[int(propParams[3])].name, propParams[4], propParams[5].replace('\n', '')))
-
 
     # Normalize objects properties by the size of the image
     for obj in objects:
@@ -104,7 +102,7 @@ def location_description(field_height, field_width, objects):
                     obj.boundary_left < obj2.boundary_left and obj.boundary_right > obj2.boundary_right):
                 return -5000
             return abs(obj.boundary_left - obj2.boundary_right) + abs(obj.height_center - obj2.height_center)
-        elif type == 'd_below' :  # distance between A.top and B.down
+        elif type == 'd_below':  # distance between A.top and B.down
             if obj.boundary_bottom < obj2.boundary_top or (
                     obj.boundary_top < obj2.boundary_top and obj.boundary_bottom > obj2.boundary_bottom):
                 return -5000
@@ -117,7 +115,7 @@ def location_description(field_height, field_width, objects):
         elif type == 'd_inside':
             if obj2.boundary_left > obj.boundary_left or obj2.boundary_right < obj.boundary_right or obj2.boundary_top > obj.boundary_top or obj2.boundary_bottom < obj.boundary_bottom :
                 return -5000
-            return 0 #TODO
+            return 0  # it should give the membership function value = 1
         elif type == 'd':
             print("Not supported")
             return 7000
@@ -185,7 +183,7 @@ def location_description(field_height, field_width, objects):
                 for k in range(len(pred)):
                     if pred[k][0] == rules[i].prop2 and pred[k][3] == obj_found:
                         if pred[j][6] != 0 and pred[k][6] != 0:
-                            ruleobj_cf = min(pred[j][6], pred[k][6])  # TODO Na razie zawsze jest tam minimum
+                            ruleobj_cf = min(pred[j][6], pred[k][6])  # assumed it's min value
                             temp = [rules[i].name, ruleobj_cf * objects[obj_found].size * rules[i].saliency, 0,
                                     obj_found,
                                     -2, i, ruleobj_cf]
@@ -193,7 +191,7 @@ def location_description(field_height, field_width, objects):
     # Sort
     rel_pred.sort(key=lambda p: p[1], reverse=True)
 
-    for pr in rel_pred:  # pr[5]-> numer relacji
+    for pr in rel_pred:  # pr[5]-> number of relations
         print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]))
 
     # Sort
@@ -248,38 +246,34 @@ def location_description(field_height, field_width, objects):
             pred_out.append(pred[i])
 
     # Print sentences
-    # TODO make them more like a sentence
     desc = []
+    sentence = ''
     for i in range(len(pred_out)):
         if pred_out[i][4] == -1:  # predicate
             sentence = objects[pred_out[i][3]].name + " " + properties[pred_out[i][5]].sentence
         elif pred_out[i][4] == -2:  # rule
             sentence = objects[pred_out[i][3]].name + " " + rules[pred_out[i][5]].sentence
-        else:  # relation TODO:Usuń?
-            sentence = objects[pred_out[i][3]].name + " " + relations[pred_out[i][5]].sentence + " " + objects[
-                pred_out[i][4]].name
+        sentence = sentence.capitalize()
         desc.append(sentence)
 
     usedRel = []
     for obj in objects:
         usedRel.append(0)
 
-    #relations:
+    # relations:
     for i in range(len(rel_pred)):
-        print("REL: " + str(rel_pred[i][1]) )
-        # if rel_pred[i][1] < 0.07: #TODO What is a good value for this point?
-        #     break
+        # print("REL: " + str(rel_pred[i][1])) -> to print values for relations
         # Decided to use every object once (at least if there is an even number of them)
         if usedRel[rel_pred[i][3]] == 1 or usedRel[rel_pred[i][4]] == 1:
             continue
         sentence = objects[rel_pred[i][3]].name + " " + relations[rel_pred[i][5]].sentence + " " + objects[
-            rel_pred[i][4]].name
+            rel_pred[i][4]].name + '.'
+        sentence = sentence.capitalize()
         usedRel[rel_pred[i][3]] = 1
         usedRel[rel_pred[i][4]] = 1
         desc.append(sentence)
 
     TEXT = ''
     for description in desc:
-        # print(description)
         TEXT = TEXT + description + '\n'
     return TEXT
