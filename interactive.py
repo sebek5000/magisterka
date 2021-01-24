@@ -9,10 +9,10 @@ from PIL import ImageTk, Image
 
 
 json_file = 'json/interactive.txt'
-size_of_movement = 100 # how much to move up, left, up or down the object
-percentage_of_size_change = 10 # how much enlarge, reduce the object
-chosen_object = 0 # currently chosen object's index
-new_name = "new_object" # name for new object
+size_of_movement = 100  # how much to move up, left, up or down the object
+percentage_of_size_change = 10  # how much enlarge, reduce the object
+chosen_object = 0  # currently chosen object's index
+new_name = "new_object"  # name for new object
 
 # Read starting "picture" from json
 read_json = common.read_objects_from_json(json_file)
@@ -50,8 +50,6 @@ def refresh_image():
     text_widget['text'] = LD.location_description(field_height, field_width, objects)
 
 
-
-
 # draw changes in the png file
 def draw():
     imgToDraw = np.array(Image.new('RGB', (field_width, field_height)))
@@ -84,29 +82,28 @@ def draw():
 def up():
     objects[chosen_object].y = objects[chosen_object].y - size_of_movement
     draw()
-    common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
-    # panel.pack_forget()
+    common.save_objects_to_json(field_height, field_width, objects, json_file)
     refresh_image()
 
 
 def down():
     objects[chosen_object].y = objects[chosen_object].y + size_of_movement
     draw()
-    common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
+    common.save_objects_to_json(field_height, field_width, objects, json_file)
     refresh_image()
 
 
 def left():
     objects[chosen_object].x = objects[chosen_object].x - size_of_movement
     draw()
-    common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
+    common.save_objects_to_json(field_height, field_width, objects, json_file)
     refresh_image()
 
 
 def right():
     objects[chosen_object].x = objects[chosen_object].x + size_of_movement
     draw()
-    common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
+    common.save_objects_to_json(field_height, field_width, objects, json_file)
     refresh_image()
 
 
@@ -124,7 +121,7 @@ def enlarge():
     objects[chosen_object].width = objects[chosen_object].width * ((100 + percentage_of_size_change)/100)
     objects[chosen_object].height = objects[chosen_object].height * ((100 + percentage_of_size_change) / 100)
     draw()
-    common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
+    common.save_objects_to_json(field_height, field_width, objects, json_file)
     refresh_image()
 
 
@@ -132,7 +129,7 @@ def reduce():
     objects[chosen_object].width = objects[chosen_object].width * ((100 - percentage_of_size_change)/100)
     objects[chosen_object].height = objects[chosen_object].height * ((100 - percentage_of_size_change) / 100)
     draw()
-    common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
+    common.save_objects_to_json(field_height, field_width, objects, json_file)
     refresh_image()
 
 
@@ -141,7 +138,7 @@ def add():
     new_object = common.Object(new_name, 0, 0, 100, 100)
     objects.append(new_object)
     draw()
-    common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
+    common.save_objects_to_json(field_height, field_width, objects, json_file)
     refresh_image()
     new_name = new_name + "1"
 
@@ -149,12 +146,10 @@ def add():
 def delete():
     global chosen_object
     objects.pop(chosen_object)
-    # if len(objects) == 0:
-    #     root.abort()
     if chosen_object == len(objects) - 1:
         chosen_object = 0
     draw()
-    common.save_objects_to_json(field_height, field_width, objects, 'json/interactive.txt')
+    common.save_objects_to_json(field_height, field_width, objects, json_file)
     refresh_image()
 
 

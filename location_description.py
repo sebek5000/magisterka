@@ -191,20 +191,20 @@ def location_description(field_height, field_width, objects):
     # Sort
     rel_pred.sort(key=lambda p: p[1], reverse=True)
 
-    for pr in rel_pred:  # pr[5]-> number of relations
-        print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]))
+    # for pr in rel_pred:  # pr[5]-> number of relations
+    #     print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(pr[1]))
 
     # Sort
     pred.sort(key=lambda p: p[1], reverse=True)
-    print("sorted predicates:")
-    for pr in pred:
-        if pr[4] == -1:
-            print(objects[pr[3]].name + " " + properties[pr[5]].sentence + " CF: " + str(pr[1]))
-        elif pr[4] == -2:
-            print(objects[pr[3]].name + " " + rules[pr[5]].sentence + " CF: " + str(pr[1]))
-        else:
-            print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(
-                pr[1]))
+    # print("sorted predicates:")
+    # for pr in pred:
+    #     if pr[4] == -1:
+    #         print(objects[pr[3]].name + " " + properties[pr[5]].sentence + " CF: " + str(pr[1]))
+    #     elif pr[4] == -2:
+    #         print(objects[pr[3]].name + " " + rules[pr[5]].sentence + " CF: " + str(pr[1]))
+    #     else:
+    #         print(objects[pr[3]].name + " " + relations[pr[5]].sentence + " " + objects[pr[4]].name + " CF: " + str(
+    #             pr[1]))
 
     def kindOfPredicate(pred):
         if pred[4] == -1:  # property
