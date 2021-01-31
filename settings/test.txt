@@ -1,14 +1,14 @@
 #properties:
-left edge,0.9,b_l,-2;-2;-1;-0.85,is by the left edge.
-left,0.8,b_l,-10;-0.9;-0.6;0,is on the left side.
-length center,0.8,c_lr,-0.2;-0.05;0.05;0.2,is in the middle of width.
-right,0.8,b_r,0;0.6;0.9;10,is on the right side.
-right edge,0.9,b_r,0.85;1;2;2,is by the right edge.
-top egde,0.9,b_t,-2;-2;-1;-0.85,is by the top edge.
-top,0.8,b_t,-10;-0.9;-0.6;0,is on the top side.
-center height,0.8,c_tb,-0.2;-0.05;0.05;0.2,is in the middle of height.
-bottom,0.7,b_b,0;0.6;0.9;10,is on the bottom side.
-bottom edge,0.9,b_b,0.85;1;2;2,is by the bottom edge.
+left edge,0.9,b_l,-2;-1;-0.95;-0.85,is by the left edge.
+left,0.8,c_lr,-1.2;-1;-0.5;0,is on the left side.
+length center,0.8,c_lr,-0.5;-0.1;0.1;0.5,is in the middle of width.
+right,0.8,c_lr,0;0.5;1;1.2,is on the right side.
+right edge,0.9,b_r,0.85;0.95;1;2,is by the right edge.
+top egde,0.9,b_t,-2;-1;-0.95;-0.85,is by the top edge.
+top,0.8,c_tb,-1.2;-1;-0.5;0,is on the top side.
+center height,0.8,c_tb,-0.5;-0.1;0.1;0.5,is in the middle of height.
+bottom,0.8,c_tb,0;0.5;1;1.2,is on the bottom side.
+bottom edge,0.9,b_b,0.85;0.95;1;2,is by the bottom edge.
 #relations: 
 on the right,0.8,d_right,-1;-0.0000001;0.0000001;1,is to the right of the
 on the left,0.8,d_left,-1;-0.0000001;0.0000001;1,is to the left of the
@@ -25,11 +25,11 @@ top left,1,1,6,min,is on the top-left side.
 top right,1,3,6,min,is on the top-right side.
 bottom right,1,3,8,min,is on the bottom-right side.
 bottom left,1,1,8,min,is on the bottom-left side.
-width,1,1,3,min,is on the whole width.
-width,1,0,3,min,is on the whole width.
-width,1,0,4,min,is on the whole width.
-width,1,1,4,min,is on the whole width.
-height,1,6,8,min,is on the whole height.
-height,1,6,9,min,is on the whole height.
-height,1,5,8,min,is on the whole height.
-height,1,5,9,min,is on the whole height.
+width,2,1,3,min,is on the whole width.
+width,2,0,3,min,is on the whole width.
+width,2,0,4,min,is on the whole width.
+width,2,1,4,min,is on the whole width.
+height,2,6,8,min,is on the whole height.
+height,2,6,9,min,is on the whole height.
+height,2,5,8,min,is on the whole height.
+height,2,5,9,min,is on the whole height.
