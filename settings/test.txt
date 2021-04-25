@@ -21,15 +21,15 @@ top left corner,1,0,5,min,is in the top-left corner.
 top right corner,1,5,9,min,is in the top-right corner.
 bottom right corner,1,4,9,min,is in the bottom-right corner.
 bottom left corner,1,0,9,min,is in the bottom-left corner.
-top left,1,1,6,min,is on the top-left side.
-top right,1,3,6,min,is on the top-right side.
-bottom right,1,3,8,min,is on the bottom-right side.
-bottom left,1,1,8,min,is on the bottom-left side.
-width,2,1,3,min,is on the whole width.
-width,2,0,3,min,is on the whole width.
-width,2,0,4,min,is on the whole width.
-width,2,1,4,min,is on the whole width.
-height,2,6,8,min,is on the whole height.
-height,2,6,9,min,is on the whole height.
-height,2,5,8,min,is on the whole height.
-height,2,5,9,min,is on the whole height.
+top left,1,1,6,min,is on the top-left part.
+top right,1,3,6,min,is on the top-right part.
+bottom right,1,3,8,min,is on the bottom-right part.
+bottom left,1,1,8,min,is on the bottom-left part.
+width,2,1,3,min,stretches the entire width.
+width,2,0,3,min,stretches the entire width.
+width,2,0,4,min,stretches the entire width.
+width,2,1,4,min,stretches the entire width. 
+height,2,6,8,min,stretches the entire height. 
+height,2,6,9,min,stretches the entire height. 
+height,2,5,8,min,stretches the entire height. 
+height,2,5,9,min,stretches the entire height.
